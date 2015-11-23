@@ -21,25 +21,25 @@ VALUES ( 1, '{1,2,3,4,5,6,7,8,9}', '{9,8,7,6,5,4,3,2,1}' ),
        ( 2, '{1,1,0,1,1,2,3,99,8}','{0,0,0,-5,4,1,1,7,6}' );
 
 -- Print out of table
-  SELECT * 
-    FROM array_tbl
-ORDER BY id;
+SELECT * 
+  FROM array_tbl
+ ORDER BY id;
 
 -- Basic statistics (min, max, mean, standard deviation)
-  SELECT id,
-         madlib.array_min(array1),
-         madlib.array_max(array1),
-         madlib.array_mean(array1),
-         madlib.array_stddev(array1)
-    FROM array_tbl
-ORDER BY id;
+SELECT id,
+       madlib.array_min(array1),
+       madlib.array_max(array1),
+       madlib.array_mean(array1),
+       madlib.array_stddev(array1)
+  FROM array_tbl
+ ORDER BY id;
 
 -- Add and subtract arrays term by term
-  SELECT id,
-         madlib.array_add(array1,array2),
-         madlib.array_sub(array1,array2)
-    FROM array_tbl
-ORDER BY id;
+SELECT id,
+       madlib.array_add(array1,array2),
+       madlib.array_sub(array1,array2)
+  FROM array_tbl
+ ORDER BY id;
 
 
 ----------------
@@ -76,9 +76,9 @@ VALUES (  1 ,  590 ,       2 ,    1 ,  50000 ,  770 , 22100),
 
 
 
-  SELECT * 
-    FROM houses
-ORDER BY id;
+SELECT * 
+  FROM houses
+ ORDER BY id;
 
 
 -- Runs the regression. Extracts data from houses 
@@ -176,9 +176,9 @@ VALUES (  1 ,             1 ,         1 ,            70),
        ( 18 ,             0 ,         0 ,            45),
        ( 20 ,             0 ,         0 ,            60);
 
-  SELECT * 
-    FROM patients
-ORDER BY id;
+SELECT * 
+  FROM patients
+ ORDER BY id;
 
 
 -- Run logistic regression
@@ -208,21 +208,21 @@ SELECT unnest(array['intercept', 'treatment', 'trait_anxiety']) AS attribute,
   FROM patients_logregr;
 
 -- Display prediction value along with the original value
-  SELECT p.id,
-         madlib.logregr_predict(coef, array[1, treatment, trait_anxiety]),
-         p.second_attack
-    FROM patients p, patients_logregr m
-ORDER BY p.id;
+SELECT p.id,
+       madlib.logregr_predict(coef, array[1, treatment, trait_anxiety]),
+       p.second_attack
+  FROM patients p, patients_logregr m
+ ORDER BY p.id;
 
 -- Displays the same result, but shows logregr_predict as 1 or 0 
 -- so that it is easier to see whether the prediction is correct.
 
 
-  SELECT p.id,
-         CAST(madlib.logregr_predict(m.coef, array[1,treatment,trait_anxiety]) AS INT),
-         second_attack
-    FROM patients p, patients_logregr m
-ORDER BY p.id;
+SELECT p.id,
+       CAST(madlib.logregr_predict(m.coef, array[1,treatment,trait_anxiety]) AS INT),
+       second_attack
+  FROM patients p, patients_logregr m
+ ORDER BY p.id;
 
 
 -- We move these into a new table called patients_logregr_results.
@@ -231,19 +231,19 @@ DROP TABLE IF EXISTS patients_logregr_results;
 
 SELECT * 
   INTO patients_logregr_results
-  FROM  (  SELECT p.id,
-                  CAST(madlib.logregr_predict(m.coef, array[1,treatment,trait_anxiety]) AS INT) AS logr_predict,
-                  second_attack
-             FROM patients p, patients_logregr m
-         ORDER BY p.id) foo;
+  FROM  (SELECT p.id,
+                CAST(madlib.logregr_predict(m.coef, array[1,treatment,trait_anxiety]) AS INT) AS logr_predict,
+                second_attack
+           FROM patients p, patients_logregr m
+          ORDER BY p.id) foo;
 
 -- Now, we have our results with an additional column named correct, 
 -- which is equal to 1 if the prediction is correct and 0 otherwise.
 
-  SELECT *,
-         CAST(logr_predict = second_attack AS INT) AS correct
-    FROM patients_logregr_results
-ORDER BY id;
+SELECT *,
+       CAST(logr_predict = second_attack AS INT) AS correct
+  FROM patients_logregr_results
+ ORDER BY id;
 
 
 -- We can simply take the average of the correct column to get the 
@@ -307,9 +307,8 @@ VALUES (1,  array[14.23, 1.71, 2.43, 15.6, 127, 2.8, 3.0600, 0.2800, 2.29, 5.64,
        (10, array[13.86, 1.35, 2.27, 16, 98, 2.98, 3.15, 0.22, 1.8500, 7.2199, 1.01, 3.55, 1045]);
 
 -- Print data
-SELECT * 
-  FROM km_sample
- ORDER BY pid;
+SELECT * FROM km_sample
+ORDER BY pid;
 
 -- Do k-means
 DROP TABLE IF EXISTS km_sample_results;
@@ -327,35 +326,10 @@ SELECT *
 -- Show results
 SELECT * FROM km_sample_results;
 
-SELECT unnest(centroids)
-  FROM km_sample_results;
 
 
----------
--- PCA --
----------
 
--- Doesn't work
 
-DROP TABLE IF EXISTS mat;
-CREATE TABLE mat (
-    row_id integer,
-    row_vec double precision[]
-);
-INSERT INTO mat
-VALUES (1, array[1,2,3]),
-       (2, array[2,1,2]),
-       (3, array[3,2,1]);
-SELECT * FROM mat;
-
-DROP TABLE IF EXISTS result_table;
-SELECT pca_train( 'mat',
-                  'result_table',
-                  'row_id',
-                  3
-                );
-
-SELECT * FROM result_table;
 
 
 
