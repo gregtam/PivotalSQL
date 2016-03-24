@@ -63,11 +63,10 @@ SELECT *
   FROM (SELECT (row_number() OVER ())::integer AS rownum, *
           FROM test_data
        ) foo_data  -- data that is being sampled
-       JOIN 
-       (SELECT ceiling((1 - random()) * 10)::integer AS rownum
-          FROM generate_series(1, 10)
-       ) foo_row_sample  -- random indices
-       ON foo_data.rownum = foo_row_sample.rownum;
+       JOIN (SELECT ceiling((1 - random()) * 10)::integer AS rownum
+               FROM generate_series(1, 10)
+            ) foo_row_sample  -- random indices
+         ON foo_data.rownum = foo_row_sample.rownum;
 
 
 -- There are two rownum columns, so we just show one.
@@ -76,11 +75,10 @@ SELECT foo_data.rownum, x,y
   FROM (SELECT (row_number() OVER ())::integer AS rownum, *
           FROM test_data
        ) foo_data
-       JOIN 
-       (SELECT ceiling((1 - random()) * 10)::integer AS rownum
-          FROM generate_series(1, 10)
-       ) foo_row_sample
-       ON foo_data.rownum = foo_row_sample.rownum;
+       JOIN (SELECT ceiling((1 - random()) * 10)::integer AS rownum
+               FROM generate_series(1, 10)
+            ) foo_row_sample
+         ON foo_data.rownum = foo_row_sample.rownum;
 
 -- Now let's put this into a new table.
 
@@ -90,11 +88,10 @@ SELECT *
           FROM (SELECT (row_number() OVER ())::integer AS rownum, *
                   FROM test_data
                ) foo_data
-               JOIN 
-               (SELECT ceiling((1 - random()) * 10)::integer AS rownum
-                  FROM generate_series(1, 10)
-               ) foo_row_sample
-               ON foo_data.rownum = foo_row_sample.rownum
+               JOIN (SELECT ceiling((1 - random()) * 10)::integer AS rownum
+                       FROM generate_series(1, 10)
+                    ) foo_row_sample
+                 ON foo_data.rownum = foo_row_sample.rownum
        ) foo_bag;
 
 SELECT * FROM bagged_test_data;
@@ -156,11 +153,10 @@ SELECT array_agg(rownum) AS rownum,
           FROM (SELECT (row_number() OVER ())::integer AS rownum, *
                   FROM test_data
                ) foo_data
-               JOIN 
-               (SELECT ceiling((1 - random()) * 10)::integer AS rownum
-                  FROM generate_series(1, 10)
-               ) foo_row_sample
-               ON foo_data.rownum = foo_row_sample.rownum
+               JOIN (SELECT ceiling((1 - random()) * 10)::integer AS rownum
+                       FROM generate_series(1, 10)
+                    ) foo_row_sample
+                 ON foo_data.rownum = foo_row_sample.rownum
        ) foo_bag;
 
 SELECT * FROM bagged_test_data;
@@ -176,7 +172,7 @@ SELECT * FROM bagged_array;
 
 
 SELECT (row_number() OVER ())::integer % 10 AS groupnum, -- 10 groups
-       ceiling((1 - random()) * 10) AS rownum            -- samples from 1 to 10
+       CEILING((1 - random()) * 10) AS rownum            -- samples from 1 to 10
   FROM generate_series(1, 10 * 15)                       -- samples of size 15
  ORDER BY groupnum;
 
@@ -188,7 +184,7 @@ DROP TABLE IF EXISTS foo_row_sample;
 SELECT *
   INTO foo_row_sample
   FROM (SELECT (row_number() OVER ())::integer % 15 AS groupnum, -- 15 groups
-               ceiling((1 - random()) * 10)::integer AS rownum   -- samples from 1 to 10
+               CEILING((1 - random()) * 10)::integer AS rownum   -- samples from 1 to 10
           FROM generate_series(1, 15 * 10)                       -- samples of size 10
          ORDER BY groupnum
        ) temp;
@@ -217,7 +213,7 @@ SELECT *
 SELECT groupnum, x, y
   FROM foo_row_sample
        JOIN foo_data
-       ON foo_data.rownum = foo_row_sample.rownum
+         ON foo_data.rownum = foo_row_sample.rownum
  ORDER BY groupnum;
 
 
@@ -274,7 +270,7 @@ DROP TABLE IF EXISTS foo_row_sample;
 SELECT *
   INTO foo_row_sample
   FROM (SELECT (row_number() OVER ())::integer % 500 AS groupnum, -- 500 groups
-               ceiling((1 - random()) * 750)::integer AS rownum   -- samples from 1 to 750
+               CEILING((1 - random()) * 750)::integer AS rownum   -- samples from 1 to 750
           FROM generate_series(1, 500 * 750)                      -- samples of size 750
          ORDER BY groupnum
        ) temp;
@@ -327,7 +323,7 @@ CREATE TABLE multiple_bags
         FROM (SELECT groupnum, x, y
                 FROM foo_row_sample
                      JOIN foo_data
-                     ON foo_data.rownum = foo_row_sample.rownum
+                       ON foo_data.rownum = foo_row_sample.rownum
                ORDER BY groupnum
              ) foo
        GROUP BY groupnum
