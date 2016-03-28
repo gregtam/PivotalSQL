@@ -51,7 +51,8 @@ CREATE TABLE patients_train_test
               END AS train_test
         FROM random_vector rv
              JOIN patients p
-               ON rv.row_id = p.id;
+               ON rv.row_id = p.id
+ DISTRIBUTED RANDOMLY;
 
 SELECT *
   FROM patients_train_test
