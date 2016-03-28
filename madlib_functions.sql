@@ -271,7 +271,7 @@ SELECT madlib.elastic_net_train( 'houses', --tbl_source
                                  TRUE, --standardize
                                  NULL, --grouping_col
                                  'fista', --optimizer
-                                 '', --optimizer_params
+                                 'warmup=TRUE, warmup_lambda_no=3', --optimizer_params
                                  NULL, --excluded
                                  10000, --max_iter
                                  1e-6 --tolerance
@@ -281,7 +281,11 @@ SELECT * FROM houses_en;
 
 -- Prints results cleanly
 SELECT unnest(features_selected) as attributes,
-       unnest(coef_nonzero) as coefficient_nonzero
+       unnest(coef_nonzero) as coef
+  FROM houses_en
+ UNION
+SELECT 'intercept',
+       intercept
   FROM houses_en;
 
 
@@ -325,11 +329,4 @@ SELECT *
 
 -- Show results
 SELECT * FROM km_sample_results;
-
-
-
-
-
-
-
 
