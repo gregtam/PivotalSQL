@@ -66,7 +66,9 @@ CREATE TABLE patients_train_test
              CASE WHEN random() < 0.8 THEN 'train'
                   ELSE 'test'
               END AS train_test
-        FROM patients;
+        FROM patients
+ DISTRIBUTED RANDOMLY;
+
 
 
 -----------------
